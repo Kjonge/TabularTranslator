@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace TabularTranslator
 {
@@ -11,6 +12,7 @@ namespace TabularTranslator
     {
         private ModelTranslations _modelTranslations;
         private string _jsonFilename;
+        private bool _unsavedChanges = false;
         private class Culturelist
         {
             public string Table { get; set; }
@@ -172,6 +174,7 @@ namespace TabularTranslator
                     serializer.Formatting = Formatting.Indented;
                     serializer.NullValueHandling = NullValueHandling.Ignore;
                     serializer.Serialize(file, translations);
+                    _unsavedChanges = false;
                 }
             }
             catch (Exception ex)
@@ -381,6 +384,30 @@ namespace TabularTranslator
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e) {
             About about = new About();
             about.ShowDialog();
+        }
+
+        private void dgvTranslations_CellValueChanged(object sender, DataGridViewCellEventArgs e) {
+            _unsavedChanges = true;
+        }
+
+        private void dgvTranslations_CurrentCellDirtyStateChanged(object sender, EventArgs e) {
+            _unsavedChanges = true;
+        }
+        protected override void OnClosing(CancelEventArgs e) {
+            if (_unsavedChanges) {
+                var confirm = MessageBox.Show("There are unsaved changes. Do you want to save them?", "Unsaved changes", MessageBoxButtons.YesNoCancel);
+                switch (confirm) {
+                    case DialogResult.Yes:
+                        SaveJsonCulturesFile(_modelTranslations, _jsonFilename);
+                        break;
+                    case DialogResult.No:
+                        break;
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                }
+            }
+            base.OnClosing(e);
         }
     }
 }

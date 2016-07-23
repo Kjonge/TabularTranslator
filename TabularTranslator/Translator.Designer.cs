@@ -58,7 +58,7 @@
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
             this.openToolStripMenuItem.ShowShortcutKeys = false;
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -67,7 +67,7 @@
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
             this.closeToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.closeToolStripMenuItem.ShowShortcutKeys = false;
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
             this.closeToolStripMenuItem.Text = "&Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click_1);
             // 
@@ -76,7 +76,7 @@
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
             this.exitToolStripMenuItem.ShowShortcutKeys = false;
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(96, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -105,11 +105,13 @@
             this.dgvTranslations.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvTranslations.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvTranslations.Location = new System.Drawing.Point(0, 61);
-            this.dgvTranslations.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dgvTranslations.Margin = new System.Windows.Forms.Padding(2);
             this.dgvTranslations.Name = "dgvTranslations";
             this.dgvTranslations.RowTemplate.Height = 24;
             this.dgvTranslations.Size = new System.Drawing.Size(897, 496);
             this.dgvTranslations.TabIndex = 1;
+            this.dgvTranslations.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTranslations_CellValueChanged);
+            this.dgvTranslations.CurrentCellDirtyStateChanged += new System.EventHandler(this.dgvTranslations_CurrentCellDirtyStateChanged);
             // 
             // lblCulture
             // 
@@ -126,7 +128,7 @@
             this.cbCultures.Enabled = false;
             this.cbCultures.FormattingEnabled = true;
             this.cbCultures.Location = new System.Drawing.Point(56, 28);
-            this.cbCultures.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.cbCultures.Margin = new System.Windows.Forms.Padding(2);
             this.cbCultures.Name = "cbCultures";
             this.cbCultures.Size = new System.Drawing.Size(180, 21);
             this.cbCultures.TabIndex = 3;
@@ -136,7 +138,7 @@
             // 
             this.btnSave.Enabled = false;
             this.btnSave.Location = new System.Drawing.Point(255, 24);
-            this.btnSave.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(2);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(112, 24);
             this.btnSave.TabIndex = 4;
@@ -148,7 +150,7 @@
             // 
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
             this.panel1.Location = new System.Drawing.Point(0, 24);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(897, 37);
             this.panel1.TabIndex = 5;
@@ -165,7 +167,7 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Translator";
             this.Text = "SSAS Tabular Translator";
             this.menuStrip1.ResumeLayout(false);
