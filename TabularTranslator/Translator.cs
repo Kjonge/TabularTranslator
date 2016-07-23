@@ -15,8 +15,9 @@ namespace TabularTranslator
         {
             public string Table { get; set; }
             public string ObjectType { get ; set; }
-            public string OrigionalName { get; set; }
-            public string OrigionalDescription { get; set; }
+            public string OriginalName { get; set; }
+            public string OriginalDescription { get; set; }
+            public string OriginalDisplayFolder { get; set; }
             public string TranslatedCaption {
                 get
                 {
@@ -99,7 +100,27 @@ namespace TabularTranslator
                     }
                 }
             }
-        
+            public string TranslatedDisplayFolder {
+                get {
+                    switch (ObjectType) {
+                        case "Column": return ((Column)this.TranslatedObject).translatedDisplayFolder;
+                        case "Measure": return ((Measure)this.TranslatedObject).translatedDisplayFolder;
+                        case "Hierarchy": return ((Hierarchy)this.TranslatedObject).translatedDisplayFolder;
+                    }
+                    return null;
+                }
+                set {
+                    switch (ObjectType) {
+                        case "Column":
+                            ((Column)this.TranslatedObject).translatedDisplayFolder = value; break;
+                        case "Measure":
+                            ((Measure)this.TranslatedObject).translatedDisplayFolder = value; break;
+                        case "Hierarchy":
+                            ((Hierarchy)this.TranslatedObject).translatedDisplayFolder = value; break;
+                    }
+                }
+            }
+
             public object TranslatedObject { get; set; }
         }
 
@@ -111,7 +132,8 @@ namespace TabularTranslator
         private ModelTranslations LoadJsonCulturesFile()
         { 
             OpenFileDialog openJsonFileDialog = new OpenFileDialog();
-            openJsonFileDialog.InitialDirectory = "c:\\";
+            // openJsonFileDialog.InitialDirectory = "c:\\"; 
+            // We don't set initial directory, so it is the same as last operation...
             openJsonFileDialog.Filter = "json files (*.json)|*.json|All files (*.*)|*.*";
             openJsonFileDialog.FilterIndex = 1;
             openJsonFileDialog.RestoreDirectory = true;
@@ -147,6 +169,7 @@ namespace TabularTranslator
                 using (StreamWriter file = File.CreateText(filename))
                 { 
                     JsonSerializer serializer = new JsonSerializer();
+                    serializer.Formatting = Formatting.Indented;
                     serializer.NullValueHandling = NullValueHandling.Ignore;
                     serializer.Serialize(file, translations);
                 }
@@ -192,6 +215,7 @@ namespace TabularTranslator
             dgvTranslations.Columns[1].ReadOnly = true;
             dgvTranslations.Columns[2].ReadOnly = true;
             dgvTranslations.Columns[3].ReadOnly = true;
+            dgvTranslations.Columns[4].ReadOnly = true;
 
 
             //Hide the last column which is the reference to the object
@@ -208,8 +232,8 @@ namespace TabularTranslator
             listItem.TranslatedObject = translations.model;
             listItem.ObjectType = "Model";
             listItem.Table = "";
-            listItem.OrigionalName = translations.model.name;
-            listItem.OrigionalDescription = _modelTranslations.ReferenceCulture.model.name;
+            listItem.OriginalName = translations.model.name;
+            listItem.OriginalDescription = _modelTranslations.ReferenceCulture.model.name;
             listItem.TranslatedCaption = translations.model.translatedCaption;
             listItem.TranslatedDescription = translations.model.translatedDescription;
             clist.Add(listItem);
@@ -220,9 +244,9 @@ namespace TabularTranslator
                 listItem.TranslatedObject = tableRow;
                 listItem.ObjectType = "Table";
                 listItem.Table = tableRow.name;
-                listItem.OrigionalName = tableRow.name;
+                listItem.OriginalName = tableRow.name;
                 ReferenceTable referenceTable = _modelTranslations.ReferenceCulture.model.tables.First(refTable => refTable.name == tableRow.name);
-                listItem.OrigionalDescription = referenceTable.description;
+                listItem.OriginalDescription = referenceTable.description;
                 listItem.TranslatedCaption = tableRow.translatedCaption;
                 listItem.TranslatedDescription = tableRow.translatedDescription;
                   clist.Add(listItem);
@@ -234,10 +258,12 @@ namespace TabularTranslator
                     listItem.ObjectType = "Column";
                     listItem.Table = tableRow.name;
                     ReferenceColumn referenceColumn = referenceTable.columns.First(refColumn => refColumn.name == columnRow.name);
-                    listItem.OrigionalDescription = referenceColumn.description;
-                    listItem.OrigionalName = columnRow.name;
+                    listItem.OriginalDescription = referenceColumn.description;
+                    listItem.OriginalDisplayFolder = referenceColumn.displayFolder;
+                    listItem.OriginalName = columnRow.name;
                     listItem.TranslatedCaption = columnRow.translatedCaption;
                     listItem.TranslatedDescription = columnRow.translatedDescription;
+                    listItem.TranslatedDisplayFolder = columnRow.translatedDisplayFolder;
                     clist.Add(listItem);
                 }
                 foreach (Hierarchy hierarchyRow in tableRow.hierarchies ?? Enumerable.Empty<Hierarchy>())
@@ -247,10 +273,12 @@ namespace TabularTranslator
                     listItem.ObjectType = "Hierarchy";
                     listItem.Table = tableRow.name;
                     ReferenceHierarchy referencehierarchy = referenceTable.hierarchies.First(refHierarchy=> refHierarchy.name == hierarchyRow.name);
-                    listItem.OrigionalDescription = referencehierarchy.description;
-                    listItem.OrigionalName = hierarchyRow.name;
+                    listItem.OriginalDescription = referencehierarchy.description;
+                    listItem.OriginalDisplayFolder = referencehierarchy.displayFolder;
+                    listItem.OriginalName = hierarchyRow.name;
                     listItem.TranslatedCaption = hierarchyRow.translatedCaption;
                     listItem.TranslatedDescription = hierarchyRow.translatedDescription;
+                    listItem.TranslatedDisplayFolder = hierarchyRow.translatedDisplayFolder;
                     clist.Add(listItem);
                     foreach (Level hierarchyLevelRow in hierarchyRow.levels ?? Enumerable.Empty<Level>())
                     {
@@ -259,8 +287,8 @@ namespace TabularTranslator
                         listItem.ObjectType = "Hierarchylevel";
                         listItem.Table = tableRow.name;
                         ReferenceLevel referenceHierarchyLevel = referencehierarchy.levels.First(refHierarchyLevel => refHierarchyLevel.name == hierarchyLevelRow.name);
-                        listItem.OrigionalDescription = referenceHierarchyLevel.description;
-                        listItem.OrigionalName = hierarchyLevelRow.name;
+                        listItem.OriginalDescription = referenceHierarchyLevel.description;
+                        listItem.OriginalName = hierarchyLevelRow.name;
                         listItem.TranslatedCaption = hierarchyLevelRow.translatedCaption;
                         listItem.TranslatedDescription = hierarchyLevelRow.translatedDescription;
                         clist.Add(listItem);
@@ -273,10 +301,12 @@ namespace TabularTranslator
                     listItem.ObjectType = "Measure";
                     listItem.Table = tableRow.name;
                     ReferenceMeasure referenceMeasure = referenceTable.measures.First(refMeasure => refMeasure.name == measureRow.name);
-                    listItem.OrigionalDescription = referenceMeasure.description;
-                    listItem.OrigionalName = measureRow.name;
+                    listItem.OriginalDescription = referenceMeasure.description;
+                    listItem.OriginalDisplayFolder = referenceMeasure.displayFolder;
+                    listItem.OriginalName = measureRow.name;
                     listItem.TranslatedCaption = measureRow.translatedCaption;
                     listItem.TranslatedDescription = measureRow.translatedDescription;
+                    listItem.TranslatedDisplayFolder = measureRow.translatedDisplayFolder;
                     clist.Add(listItem);
                     if (measureRow.kpi != null)
                     {
@@ -285,10 +315,12 @@ namespace TabularTranslator
                         listItem.TranslatedObject = measureRow;
                         listItem.ObjectType = "KPI";
                         listItem.Table = tableRow.name;
-                        listItem.OrigionalDescription = referenceMeasure.kpi.description;
-                        listItem.OrigionalName = measureRow.name;
+                        listItem.OriginalDescription = referenceMeasure.kpi.description;
+                        listItem.OriginalDisplayFolder = referenceMeasure.kpi.displayFolder;
+                        listItem.OriginalName = measureRow.name;
                         listItem.TranslatedCaption = string.Empty;
                         listItem.TranslatedDescription = measureRow.kpi.translatedDescription;
+                        listItem.TranslatedDisplayFolder = measureRow.kpi.translatedDisplayFolder;
                         clist.Add(listItem);
                     }
                 }
@@ -301,8 +333,8 @@ namespace TabularTranslator
                 listItem.ObjectType = "Perspective";
                 listItem.Table = string.Empty;
                 ReferencePerspective referencePerspective = _modelTranslations.ReferenceCulture.model.perspectives.First(refPerspective => refPerspective.name == perspectiveRow.name);
-                listItem.OrigionalDescription = referencePerspective.description;
-                listItem.OrigionalName = perspectiveRow.name;
+                listItem.OriginalDescription = referencePerspective.description;
+                listItem.OriginalName = perspectiveRow.name;
                 listItem.TranslatedCaption = perspectiveRow.translatedCaption;
                 listItem.TranslatedDescription = perspectiveRow.translatedDescription;
                 clist.Add(listItem);
@@ -344,6 +376,11 @@ namespace TabularTranslator
             cbCultures.Enabled = false;
             btnSave.Enabled = false;
             dgvTranslations.DataSource = null;
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e) {
+            About about = new About();
+            about.ShowDialog();
         }
     }
 }

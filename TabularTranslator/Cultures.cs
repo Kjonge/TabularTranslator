@@ -42,12 +42,14 @@ namespace TabularTranslator
     {
         public string name { get; set; }
         public string description { get; set; }
+        public string displayFolder { get; set; }
     }
 
     public class ReferenceMeasure
     {
         public string name { get; set; }
         public string description { get; set; }
+        public string displayFolder { get; set; }
 
         public ReferenceKpi kpi { get; set; }
     }
@@ -55,13 +57,15 @@ namespace TabularTranslator
     public class ReferenceKpi
     {
         public string description { get; set; }
-        public string translatedDescription { get; set; }
+        public string displayFolder { get; set; }
+        // public string translatedDescription { get; set; } wrong property??
     }
 
     public class ReferenceHierarchy
     {
         public string name { get; set; }
         public string description { get; set; }
+        public string displayFolder { get; set; }
         public ReferenceLevel[] levels { get; set; }
     }
 
@@ -119,6 +123,7 @@ namespace TabularTranslator
         public string name { get; set; }
         public string translatedCaption { get; set; }
         public string translatedDescription { get; set; }
+        public string translatedDisplayFolder { get; set; }
     }
 
     public class Measure
@@ -126,18 +131,21 @@ namespace TabularTranslator
         public string name { get; set; }
         public string translatedCaption { get; set; }
         public string translatedDescription { get; set; }
+        public string translatedDisplayFolder { get; set; }
         public Kpi kpi { get; set; }
     }
 
     public class Kpi
     {
         public string translatedDescription { get; set; }
+        public string translatedDisplayFolder { get; set; }
     }
     public class Hierarchy
     {
         public string name { get; set; }
         public string translatedCaption { get; set; }
         public string translatedDescription { get; set; }
+        public string translatedDisplayFolder { get; set; }
         public Level[] levels { get; set; }
     }
 
