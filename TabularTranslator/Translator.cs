@@ -373,12 +373,14 @@ namespace TabularTranslator
 
         private void closeToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            _modelTranslations = null;
-            cbCultures.SelectedItem = null;
-            cbCultures.Items.Clear();
-            cbCultures.Enabled = false;
-            btnSave.Enabled = false;
-            dgvTranslations.DataSource = null;
+            if (ConfirmCloseFile()) {
+                _modelTranslations = null;
+                cbCultures.SelectedItem = null;
+                cbCultures.Items.Clear();
+                cbCultures.Enabled = false;
+                btnSave.Enabled = false;
+                dgvTranslations.DataSource = null;
+            }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -393,21 +395,30 @@ namespace TabularTranslator
         private void dgvTranslations_CurrentCellDirtyStateChanged(object sender, EventArgs e) {
             _unsavedChanges = true;
         }
-        protected override void OnClosing(CancelEventArgs e) {
+        private bool ConfirmCloseFile() {
+            bool result = !_unsavedChanges;
             if (_unsavedChanges) {
                 var confirm = MessageBox.Show("There are unsaved changes. Do you want to save them?", "Unsaved changes", MessageBoxButtons.YesNoCancel);
                 switch (confirm) {
                     case DialogResult.Yes:
                         SaveJsonCulturesFile(_modelTranslations, _jsonFilename);
+                        result = true;
                         break;
                     case DialogResult.No:
+                        result = true;
                         break;
                     case DialogResult.Cancel:
-                        e.Cancel = true;
                         break;
                 }
             }
+            return result;
+        }
+        protected override void OnClosing(CancelEventArgs e) {
+            if (!ConfirmCloseFile()) {
+                e.Cancel = true;
+            }
             base.OnClosing(e);
         }
+
     }
 }
