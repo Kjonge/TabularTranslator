@@ -224,6 +224,7 @@ namespace TabularTranslator
             //Hide the last column which is the reference to the object
             dgvTranslations.Columns[dgvTranslations.ColumnCount - 1].Visible = false;
             dgvTranslations.AutoResizeColumns();
+            dgvTranslations.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
         }
 
         private List<Culturelist> CreateListfromTranslation(Translations translations)
@@ -420,5 +421,65 @@ namespace TabularTranslator
             base.OnClosing(e);
         }
 
+        private void dgvTranslations_KeyUp(object sender, KeyEventArgs e) {
+            if ((e.Shift && e.KeyCode == Keys.Insert) || (e.Control && e.KeyCode == Keys.V)) {
+                char[] rowSplitter = { '\r', '\n' };
+                char[] columnSplitter = { '\t' };
+                //get the text from clipboard
+                IDataObject dataInClipboard = Clipboard.GetDataObject();
+                string stringInClipboard = ((string)dataInClipboard.GetData(DataFormats.Text)).Replace("\r\n", "\n");
+                //split it into lines
+                string[] rowsInClipboard = stringInClipboard.Split(rowSplitter);
+
+                //get the row and column of selected cell in grid
+                int r = dgvTranslations.SelectedCells[0].RowIndex;
+                int c = dgvTranslations.SelectedCells[0].ColumnIndex;
+
+                //Retrieve min and max range
+                int MinRow = dgvTranslations.SelectedCells[0].RowIndex;
+                int MinCol = dgvTranslations.SelectedCells[0].ColumnIndex;
+                int MaxRow = MinRow;
+                int MaxCol = MinCol;
+                for (int i = 1; i < dgvTranslations.SelectedCells.Count; i++ ) {
+                    var selCell = dgvTranslations.SelectedCells[i];
+                    if (selCell.RowIndex < MinRow) MinRow = selCell.RowIndex;
+                    if (selCell.RowIndex > MaxRow) MaxRow = selCell.RowIndex;
+                    if (selCell.ColumnIndex < MinCol) MinCol = selCell.ColumnIndex;
+                    if (selCell.ColumnIndex > MaxCol) MaxCol = selCell.ColumnIndex;
+                }
+
+                bool singleRowInClipboard = rowsInClipboard.Length == 1;
+                int rowsToPaste = singleRowInClipboard ? (MaxRow - MinRow + 1) : rowsInClipboard.Length;
+                // loop through the lines, split them into cells and place the values in the corresponding cell.
+                for (int iRow = 0; iRow < rowsToPaste; iRow++) {
+
+                    int assignRow = MinRow + iRow;
+                     //split row into cell values
+                    string[] valuesInRow = rowsInClipboard[singleRowInClipboard ? 0 : iRow].Split(columnSplitter);
+                    //cycle through cell values
+                    for (int iCol = 0; iCol < valuesInRow.Length; iCol++) {
+                        int assignColumn = MinCol + iCol;
+
+                        // Check that the cell is within the selection
+                        bool inSelection = false;
+                        for (int i = 0; i < dgvTranslations.SelectedCells.Count; i++) {
+                            var selCell = dgvTranslations.SelectedCells[i];
+                            if ((selCell.RowIndex == assignRow || MinRow == MaxRow) 
+                                && (selCell.ColumnIndex == assignColumn || MinCol == MaxCol) ) {
+                                inSelection = true;
+                                break;
+                            }
+                        }
+                        //assign cell value, only if it within columns of the grid
+                        if (inSelection
+                            && (dgvTranslations.ColumnCount - 1 >= MinCol + iCol)
+                            && (dgvTranslations.RowCount - 1 >= MinRow + iRow) ) {
+                            dgvTranslations.Rows[assignRow].Cells[assignColumn].Value = valuesInRow[iCol];
+                        }
+                    }
+                }
+            
+            }
+        }
     }
 }
